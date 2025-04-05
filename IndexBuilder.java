@@ -47,7 +47,7 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Map<String, Map<String, Double>> buildIndex(Map<String, List<String>> docs) {
-        return Map.of();
+        return IndexUtils.calculateTFIDF(docs);
     }
 
     @Override
