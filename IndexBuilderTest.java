@@ -23,9 +23,10 @@ public class IndexBuilderTest {
         Map<String, List<String>> result = ib.parseFeed(feeds);
         assertEquals(5, result.size(), "There should have been 5 links parsed");
 
-        for (Map.Entry<String, List<String>> entry : result.entrySet()) {
-            assertTrue(entry.getKey().contains("https://www.seas.upenn.edu/~cit5940/page"));
-            assertFalse(entry.getValue().isEmpty(), "Each web page should have some text");
+        int[] pageNums = {1, 2, 3, 4, 5};
+        for (int pageNum : pageNums) {
+            assertTrue(result.containsKey(getUpennPageUrl(pageNum)), "Page " + pageNum + " should have been parsed");
+            assertFalse(result.get(getUpennPageUrl(pageNum)).isEmpty(), "Page " + pageNum + " should have words");
         }
 
         assertEquals(10, result.get(getUpennPageUrl(1)).size());
