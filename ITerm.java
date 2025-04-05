@@ -10,16 +10,11 @@ public interface ITerm
     /**
      * Compares the two terms in descending order by weight.
      * 
-     * @return a comparator
+     * @return comparator Object
      */
     public static Comparator<ITerm> byReverseWeightOrder()
     {
-        return new Comparator<ITerm>() {
-            public int compare(ITerm t1, ITerm t2)
-            {
-                return (int)(((Term)t2).getWeight() - ((Term)t1).getWeight());
-            }
-        };
+        return new ByReverseWeightOrder();
     }
 
 
@@ -32,19 +27,10 @@ public interface ITerm
      */
     public static Comparator<ITerm> byPrefixOrder(int r)
     {
-        return new Comparator<ITerm>() {
-            public int compare(ITerm t1, ITerm t2)
-            {
-                int min_length = Math.min(((Term)t1).getTerm().length(), ((Term)t2).getTerm().length());
-                int l = r;
-                if(r > min_length) {
-                    l = min_length;
-                }
-                String w1 = ((Term)t1).getTerm().substring(0, l);
-                String w2 = ((Term)t2).getTerm().substring(0, l);
-                return w1.compareTo(w2);
-            }
-        };
+        if (r < 0) {
+            throw new IllegalArgumentException("Prefix length cannot be negative");
+        }
+        return new ByPrefixOrder(r);
     }
 
     // Compares the two terms in lexicographic order by query.
@@ -54,5 +40,13 @@ public interface ITerm
     // Returns a string representation of this term in the following format:
     // the weight, followed by a tab, followed by the query.
     public String toString();
+
+    // Required getters.
+    public long getWeight();
+    public String getTerm();
+
+    // Required setters (mostly for autograding purposes)
+    public void setWeight(long weight);
+    public String setTerm(String term);
 
 }
