@@ -52,7 +52,40 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Map<?, ?> buildInvertedIndex(Map<String, Map<String, Double>> index) {
-        return Map.of();
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex = new HashMap<>();
+
+        for (Map.Entry<String, Map<String, Double>> entry : index.entrySet()) {
+            String documentName = entry.getKey();
+            Map<String, Double> documentTFIDF = entry.getValue();
+
+            for (Map.Entry<String, Double> tfidfEntry : documentTFIDF.entrySet()) {
+                String word = tfidfEntry.getKey();
+                double tfidf = tfidfEntry.getValue();
+
+                if (!invertedIndex.containsKey(word)) {
+                    invertedIndex.put(word, new ArrayList<>());
+                }
+
+                invertedIndex.get(word).add(new AbstractMap.SimpleEntry<>(documentName, tfidf));
+            }
+        }
+
+        // Sort the lists so that the documents with the highest TFIDF are at the top
+        for (Map.Entry<String, List<AbstractMap.SimpleEntry<String, Double>>> entry : invertedIndex.entrySet()) {
+            String word = entry.getKey();
+            List<AbstractMap.SimpleEntry<String, Double>> tfidfValues = entry.getValue();
+
+            Collections.sort(tfidfValues, new Comparator<AbstractMap.SimpleEntry>() {
+                public int compare(AbstractMap.SimpleEntry o1, AbstractMap.SimpleEntry o2) {
+                    double v1 = ((Number) o1.getValue()).doubleValue();
+                    double v2 = ((Number) o2.getValue()).doubleValue();
+
+                    return Double.compare(v2, v1);
+                }
+            });
+        }
+
+        return invertedIndex;
     }
 
     @Override

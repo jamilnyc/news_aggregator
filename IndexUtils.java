@@ -41,7 +41,7 @@ public class IndexUtils {
         for (Map.Entry<String, List<String>> entry : docs.entrySet()) {
             String documentName = entry.getKey();
             List<String> documentWords = entry.getValue();
-            tfidf.put(documentName, new HashMap<String, Double>());
+            tfidf.put(documentName, new TreeMap<String, Double>());
 
             for (String uniqueWord : uniqueWords) {
                 // Number of times `t` appears in document `d`

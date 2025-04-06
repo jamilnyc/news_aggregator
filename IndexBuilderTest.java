@@ -1,9 +1,6 @@
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,6 +104,23 @@ public class IndexBuilderTest {
         assertEquals(0.0509, page5.get("files"), 0.001);
         assertTrue(page5.containsKey("completely"));
         assertEquals(0.0894, page5.get("completely"), 0.001);
+    }
+
+    @Test
+    public void testBuildInvertedIndex() {
+        List<String> feeds = new ArrayList<>();
+        feeds.add(UPENN_RSS_URL);
+
+        IndexBuilder ib = new IndexBuilder();
+        Map<String, List<String>> docs = ib.parseFeed(feeds);
+        Map<String, Map<String, Double>> forwardIndex = ib.buildIndex(docs);
+
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
+                = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) ib.buildInvertedIndex(forwardIndex);
+
+        assertEquals(5, invertedIndex.get("structures").size());
+        assertEquals(getUpennPageUrl(1), invertedIndex.get("structures").get(0).getKey());
+        assertEquals(0.183, invertedIndex.get("structures").get(0).getValue(), 0.001);
     }
 
 }
