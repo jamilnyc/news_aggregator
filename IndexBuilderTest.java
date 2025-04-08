@@ -115,11 +115,22 @@ public class IndexBuilderTest {
         Map<String, List<String>> docs = ib.parseFeed(feeds);
         Map<String, Map<String, Double>> forwardIndex = ib.buildIndex(docs);
 
-        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
-                = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) ib.buildInvertedIndex(forwardIndex);
+        Map<?,?> map = ib.buildInvertedIndex(forwardIndex);
+        // Check the map keys and values are the right type before casting
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            assertInstanceOf(String.class, entry.getKey(), "The map key should be a string");
+            assertInstanceOf(List.class, entry.getValue(), "The map value should be a list");
+            assertInstanceOf(AbstractMap.SimpleEntry.class, ((List<?>) entry.getValue()).getFirst(), "The list elements should be SimpleEntry");
+        }
 
-        assertEquals(5, invertedIndex.get("structures").size());
-        assertEquals(getUpennPageUrl(1), invertedIndex.get("structures").get(0).getKey());
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
+                = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) map;
+
+        // Each term should map to a list of 5 document-TFIDF tuples
+        assertEquals(5, invertedIndex.get("structures").size(), "Each term should have a list of 5 documents with TFIDF scores");
+
+        // The list should be sorted by the TFIDF of the tuple
+        assertEquals(getUpennPageUrl(1), invertedIndex.get("structures").get(0).getKey(), "Entries in the list should be sorted in descending order of TFIDF");
         assertEquals(0.183, invertedIndex.get("structures").get(0).getValue(), 0.001);
     }
 
