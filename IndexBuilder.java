@@ -90,7 +90,40 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Collection<Map.Entry<String, List<String>>> buildHomePage(Map<?, ?> invertedIndex) {
-        return List.of();
+        // Remove terms that are stop words
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> trueInvertedIndex = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) invertedIndex;
+        Arrays.asList(STOPW).forEach(trueInvertedIndex.keySet()::remove);
+
+        // For the remaining terms, remove articles that have a 0 TFIDF score
+        for (Map.Entry<String, List<AbstractMap.SimpleEntry<String, Double>>> entry : trueInvertedIndex.entrySet()) {
+            String word = entry.getKey();
+            List<AbstractMap.SimpleEntry<String, Double>> tfidf = entry.getValue();
+            tfidf.removeIf(t -> t.getValue() <= 0.0);
+        }
+
+        // Terms to list of associated articles
+        List<Map.Entry<String, List<String>>> cleaned = new ArrayList<>();
+        for (Map.Entry<String, List<AbstractMap.SimpleEntry<String, Double>>> entry : trueInvertedIndex.entrySet()) {
+            String word = entry.getKey();
+            List<AbstractMap.SimpleEntry<String, Double>> tfidf = entry.getValue();
+            List<String> documents = new ArrayList<>();
+            for (AbstractMap.SimpleEntry<String, Double> tfidfEntry : tfidf) {
+                documents.add(tfidfEntry.getKey());
+            }
+            cleaned.add(new AbstractMap.SimpleEntry<>(word, documents));
+        }
+
+        // Tag terms are sorted by the number of articles (descending), then by reverse lexicographic order
+        Collections.sort(cleaned, new Comparator<>() {
+            public int compare(Map.Entry<String, List<String>> o1, Map.Entry<String, List<String>> o2) {
+                if (o1.getValue().size() == o2.getValue().size()) {
+                    return o2.getKey().compareTo(o1.getKey());
+                }
+                return o2.getValue().size() - o1.getValue().size();
+            }
+        });
+
+        return cleaned;
     }
 
     @Override

@@ -134,4 +134,22 @@ public class IndexBuilderTest {
         assertEquals(0.183, invertedIndex.get("structures").get(0).getValue(), 0.001);
     }
 
+    @Test
+    public void testBuildHomePage() {
+        List<String> feeds = new ArrayList<>();
+        feeds.add(UPENN_RSS_URL);
+
+        IndexBuilder ib = new IndexBuilder();
+        Map<String, List<String>> docs = ib.parseFeed(feeds);
+        Map<String, Map<String, Double>> forwardIndex = ib.buildIndex(docs);
+        Map<?,?> map = ib.buildInvertedIndex(forwardIndex);
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
+                = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) map;
+
+        Collection<Map.Entry<String, List<String>>> h = ib.buildHomePage(invertedIndex);
+        Map.Entry<String, List<String>> first = h.iterator().next();
+        assertEquals("data", first.getKey());
+        assertEquals(3, first.getValue().size());
+        assertEquals(getUpennPageUrl(1), first.getValue().getFirst());
+    }
 }
