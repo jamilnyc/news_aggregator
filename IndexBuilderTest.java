@@ -1,5 +1,11 @@
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -174,5 +180,45 @@ public class IndexBuilderTest {
         assertEquals(getUpennPageUrl(1), matches.get(0), "Page 1 should be the most relevant to the term 'data'");
         assertEquals(getUpennPageUrl(2), matches.get(1));
         assertEquals(getUpennPageUrl(3), matches.get(2));
+    }
+
+    @Test
+    public void testCreateAutocompleteFile()
+    {
+        List<String> feeds = new ArrayList<>();
+        feeds.add(UPENN_RSS_URL);
+
+        IndexBuilder ib = new IndexBuilder();
+        Map<String, List<String>> docs = ib.parseFeed(feeds);
+        Map<String, Map<String, Double>> forwardIndex = ib.buildIndex(docs);
+        Map<?,?> map = ib.buildInvertedIndex(forwardIndex);
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
+                = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) map;
+
+        Collection<Map.Entry<String, List<String>>> h = ib.buildHomePage(invertedIndex);
+
+        ib.createAutocompleteFile(h);
+        assertTrue(Files.exists(Path.of("autocomplete.txt")));
+
+        BufferedReader br;
+        boolean isFirstLine = true;
+        try {
+            br = new BufferedReader(new FileReader("autocomplete.txt"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                line = line.trim();
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    assertEquals(h.size(), Integer.parseInt(line));
+                    continue;
+                }
+                String[] parts = line.split("\\s+");
+                assertEquals(2, parts.length);
+                assertEquals(0, Integer.parseInt(parts[0]));
+                assertFalse(parts[1].isEmpty());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

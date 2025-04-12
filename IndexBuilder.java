@@ -3,7 +3,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 public class IndexBuilder implements IIndexBuilder {
@@ -130,7 +133,34 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Collection<?> createAutocompleteFile(Collection<Map.Entry<String, List<String>>> homepage) {
-        return List.of();
+        File autocompleteFile;
+        List<String> words = new ArrayList<>();
+        try {
+            autocompleteFile = new File("autocomplete.txt");
+            Files.deleteIfExists(autocompleteFile.toPath());
+            if (!autocompleteFile.createNewFile()) {
+                System.err.println("Could not create autocomplete file.");
+                return null;
+            }
+
+            for (Map.Entry<String, List<String>> entry : homepage) {
+                String word = entry.getKey();
+                words.add(word);
+            }
+            Collections.sort(words);
+
+            FileWriter fw = new FileWriter(autocompleteFile);
+            fw.write(homepage.size() + "\n");
+            for (String word : words) {
+                fw.write("    " + 0 + " " + word + "\n");
+            }
+            fw.close();
+        } catch (IOException e) {
+            System.err.println("Could not create autocomplete file.");
+            throw new RuntimeException(e);
+        }
+
+        return words;
     }
 
     @Override
