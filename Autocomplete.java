@@ -26,6 +26,7 @@ public class Autocomplete implements IAutocomplete {
         }
 
         word = word.toLowerCase();
+        System.out.println("🌲 Adding word to trie: " + word);
         Node currentNode = root;
         currentNode.incrementPrefixes();
 

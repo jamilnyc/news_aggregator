@@ -3,7 +3,7 @@ import java.util.List;
 
 public class StringUtils {
     public static String removePunctuation(String input) {
-        return input.replaceAll("[;,'!?.:\"()]", "");
+        return input.replaceAll("[;,'!?.:\"()&]", "");
     }
 
     public static List<String> tokenize(String input) {
