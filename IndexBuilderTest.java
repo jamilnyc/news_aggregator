@@ -150,10 +150,29 @@ public class IndexBuilderTest {
         Map.Entry<String, List<String>> first = h.iterator().next();
 
         // Should be sorted by the term that has the most non-zero documents
-        assertEquals("data", first.getKey());
+        assertEquals("data", first.getKey(), "The term 'data' should have the most relevant articles of all terms");
         assertEquals(3, first.getValue().size());
 
         // The documents should be sorted by TFIDF scores in descending order
         assertEquals(getUpennPageUrl(1), first.getValue().getFirst());
+    }
+
+    @Test
+    public void testSearchArticles() {
+        List<String> feeds = new ArrayList<>();
+        feeds.add(UPENN_RSS_URL);
+
+        IndexBuilder ib = new IndexBuilder();
+        Map<String, List<String>> docs = ib.parseFeed(feeds);
+        Map<String, Map<String, Double>> forwardIndex = ib.buildIndex(docs);
+        Map<?,?> map = ib.buildInvertedIndex(forwardIndex);
+
+        List<String> matches = ib.searchArticles("data", map);
+        assertEquals(3, matches.size(), "There should be 3 articles with non-zero TFIDF scores");
+
+        // Check they are in order from most relevant to least
+        assertEquals(getUpennPageUrl(1), matches.get(0), "Page 1 should be the most relevant to the term 'data'");
+        assertEquals(getUpennPageUrl(2), matches.get(1));
+        assertEquals(getUpennPageUrl(3), matches.get(2));
     }
 }

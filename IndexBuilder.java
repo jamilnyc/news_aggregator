@@ -135,6 +135,15 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public List<String> searchArticles(String queryTerm, Map<?, ?> invertedIndex) {
-        return List.of();
+        Map<String, List<AbstractMap.SimpleEntry<String, Double>>> trueInvertedIndex = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) invertedIndex;
+        List<String> matchingArticles = new ArrayList<>();
+        for(AbstractMap.SimpleEntry<String, Double> entry : trueInvertedIndex.get(queryTerm)) {
+            // Only match articles that are actually relevant
+            if (entry.getValue() > 0) {
+                matchingArticles.add(entry.getKey());
+            }
+        }
+
+        return matchingArticles;
     }
 }
