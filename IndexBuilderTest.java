@@ -148,8 +148,12 @@ public class IndexBuilderTest {
 
         Collection<Map.Entry<String, List<String>>> h = ib.buildHomePage(invertedIndex);
         Map.Entry<String, List<String>> first = h.iterator().next();
+
+        // Should be sorted by the term that has the most non-zero documents
         assertEquals("data", first.getKey());
         assertEquals(3, first.getValue().size());
+
+        // The documents should be sorted by TFIDF scores in descending order
         assertEquals(getUpennPageUrl(1), first.getValue().getFirst());
     }
 }

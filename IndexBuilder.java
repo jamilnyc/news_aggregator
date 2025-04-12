@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class IndexBuilder implements IIndexBuilder {
+
     @Override
     public Map<String, List<String>> parseFeed(List<String> feeds) {
         Map<String, List<String>> docs = new HashMap<>();
@@ -52,6 +53,7 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Map<?, ?> buildInvertedIndex(Map<String, Map<String, Double>> index) {
+        // Word -> List<Entry<DocumentName, TFIDF>>
         Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex = new HashMap<>();
 
         for (Map.Entry<String, Map<String, Double>> entry : index.entrySet()) {
@@ -94,7 +96,7 @@ public class IndexBuilder implements IIndexBuilder {
         Map<String, List<AbstractMap.SimpleEntry<String, Double>>> trueInvertedIndex = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) invertedIndex;
         Arrays.asList(STOPW).forEach(trueInvertedIndex.keySet()::remove);
 
-        // For the remaining terms, remove articles that have a 0 TFIDF score
+        // For the remaining terms, remove documents that have a 0 TFIDF score
         for (Map.Entry<String, List<AbstractMap.SimpleEntry<String, Double>>> entry : trueInvertedIndex.entrySet()) {
             String word = entry.getKey();
             List<AbstractMap.SimpleEntry<String, Double>> tfidf = entry.getValue();

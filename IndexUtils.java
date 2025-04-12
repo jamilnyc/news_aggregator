@@ -32,6 +32,7 @@ public class IndexUtils {
         return inverseDocumentFrequencies;
     }
 
+    // Returns Forward Index: map of document name to a map of terms -> TFIDF values in that document
     public static Map<String, Map<String, Double>> calculateTFIDF(Map<String, List<String>> docs) {
         Map<String, Double> inverseDocumentFrequencies = getInverseDocumentFrequencies(docs);
         Map<String, Map<String, Double>> tfidf = new HashMap<>();
@@ -59,7 +60,15 @@ public class IndexUtils {
         return tfidf;
     }
 
+    /**
+     * Return all the unique words across all documents.
+     *
+     * @param docs Map of document names to lists of words in those documents
+     * @return A Set of all unique strings in the Map's values
+     */
     public static Set<String> getUniqueWords(Map<String, List<String>> docs) {
+        // Sets can only have unique elements, so putting all the strings
+        // into a Set takes care of figuring out which ones are unique
         Set<String> uniqueWords = new HashSet<>();
         for (Map.Entry<String, List<String>> entry : docs.entrySet()) {
             uniqueWords.addAll(entry.getValue());
