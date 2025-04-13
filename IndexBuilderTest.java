@@ -1,7 +1,6 @@
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -132,8 +131,8 @@ public class IndexBuilderTest {
         Map<String, List<AbstractMap.SimpleEntry<String, Double>>> invertedIndex
                 = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) map;
 
-        // Each term should map to a list of 5 document-TFIDF tuples
-        assertEquals(5, invertedIndex.get("structures").size(), "Each term should have a list of 5 documents with TFIDF scores");
+        // Remove documents with 0 TFIDF scores
+        assertEquals(2, invertedIndex.get("structures").size(), "term 'structures' should have a list of 2 documents with TFIDF scores");
 
         // The list should be sorted by the TFIDF of the tuple
         assertEquals(getUpennPageUrl(1), invertedIndex.get("structures").get(0).getKey(), "Entries in the list should be sorted in descending order of TFIDF");

@@ -97,7 +97,9 @@ public class IndexBuilder implements IIndexBuilder {
                     invertedIndex.put(word, new ArrayList<>());
                 }
 
-                invertedIndex.get(word).add(new AbstractMap.SimpleEntry<>(documentName, tfidf));
+                if (tfidf > 0) {
+                    invertedIndex.get(word).add(new AbstractMap.SimpleEntry<>(documentName, tfidf));
+                }
             }
         }
 
