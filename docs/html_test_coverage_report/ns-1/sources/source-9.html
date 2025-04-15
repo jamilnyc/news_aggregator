@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IndexUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IndexUtils (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IndexUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (33/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import java.nio.DoubleBuffer;
+&nbsp;import java.util.*;
+&nbsp;
+<b class="nc">&nbsp;public class IndexUtils {</b>
+&nbsp;    /**
+&nbsp;     * Calculate the inverse document frequencies (IDF) of all words in the given map of documents.
+&nbsp;     *
+&nbsp;     * @param docs Map of document names to a list of the words in the document.
+&nbsp;     * @return Map of words to their IDF values.
+&nbsp;     */
+&nbsp;    public static Map&lt;String, Double&gt; getInverseDocumentFrequencies(Map&lt;String, List&lt;String&gt;&gt; docs) {
+<b class="fc">&nbsp;        int totalNumberOfDocuments = docs.size();</b>
+&nbsp;
+&nbsp;        // Number of documents with term `t` in it
+<b class="fc">&nbsp;        Map&lt;String, Integer&gt; termDocumentCounts = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        Set&lt;String&gt; uniqueWords = getUniqueWords(docs);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (String uniqueWord : uniqueWords) {</b>
+&nbsp;            // Initialize the number of documents that contain this word to 0
+<b class="fc">&nbsp;            termDocumentCounts.put(uniqueWord, 0);</b>
+&nbsp;
+&nbsp;            // Loop over every document and check if it contains the word
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : docs.entrySet()) {</b>
+<b class="fc">&nbsp;                if (entry.getValue().contains(uniqueWord)) {</b>
+<b class="fc">&nbsp;                    termDocumentCounts.put(uniqueWord, termDocumentCounts.get(uniqueWord) + 1);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; inverseDocumentFrequencies = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, Integer&gt; entry : termDocumentCounts.entrySet()) {</b>
+<b class="fc">&nbsp;            String uniqueWord = entry.getKey();</b>
+<b class="fc">&nbsp;            double numberOfDocumentsWithTerm = (double) entry.getValue();</b>
+<b class="fc">&nbsp;            double idf = Math.log(totalNumberOfDocuments / numberOfDocumentsWithTerm);</b>
+<b class="fc">&nbsp;            inverseDocumentFrequencies.put(uniqueWord, idf);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return inverseDocumentFrequencies;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Returns Forward Index: map of document name to a map of terms -&gt; TFIDF values in that document
+&nbsp;    /**
+&nbsp;     * Get a map of document names to a map of terms in that document and their colculated TFIDF values.
+&nbsp;     *
+&nbsp;     * @param docs Map of document names to a list of words in the document
+&nbsp;     * @return map of document names to a map of terms in the document to their TFIDF values
+&nbsp;     */
+&nbsp;    public static Map&lt;String, Map&lt;String, Double&gt;&gt; calculateTFIDF(Map&lt;String, List&lt;String&gt;&gt; docs) {
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; inverseDocumentFrequencies = getInverseDocumentFrequencies(docs);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; tfidf = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        Set&lt;String&gt; uniqueWords = getUniqueWords(docs);</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : docs.entrySet()) {</b>
+<b class="fc">&nbsp;            String documentName = entry.getKey();</b>
+<b class="fc">&nbsp;            List&lt;String&gt; documentWords = entry.getValue();</b>
+<b class="fc">&nbsp;            tfidf.put(documentName, new TreeMap&lt;String, Double&gt;());</b>
+&nbsp;
+<b class="fc">&nbsp;            for (String uniqueWord : uniqueWords) {</b>
+&nbsp;                // Number of times `t` appears in document `d`
+<b class="fc">&nbsp;                int appearances = Collections.frequency(documentWords, uniqueWord);</b>
+&nbsp;
+&nbsp;                // Total number of words in the document `d`
+<b class="fc">&nbsp;                int totalWords = documentWords.size();</b>
+&nbsp;
+<b class="fc">&nbsp;                double termFrequency = (double) appearances / (double) totalWords;</b>
+<b class="fc">&nbsp;                double idf = inverseDocumentFrequencies.get(uniqueWord);</b>
+<b class="fc">&nbsp;                tfidf.get(documentName).put(uniqueWord, termFrequency * idf);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return tfidf;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return all the unique words across all documents.
+&nbsp;     *
+&nbsp;     * @param docs Map of document names to lists of words in those documents
+&nbsp;     * @return A Set of all unique strings in the Map&#39;s values
+&nbsp;     */
+&nbsp;    public static Set&lt;String&gt; getUniqueWords(Map&lt;String, List&lt;String&gt;&gt; docs) {
+&nbsp;        // Sets can only have unique elements, so putting all the strings
+&nbsp;        // into a Set takes care of figuring out which ones are unique
+<b class="fc">&nbsp;        Set&lt;String&gt; uniqueWords = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : docs.entrySet()) {</b>
+<b class="fc">&nbsp;            uniqueWords.addAll(entry.getValue());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return uniqueWords;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

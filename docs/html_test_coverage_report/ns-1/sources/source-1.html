@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Autocomplete</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: Autocomplete (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Autocomplete</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="nc">&nbsp;public class Autocomplete implements IAutocomplete {</b>
+&nbsp;    Node root;
+&nbsp;
+&nbsp;    // Maximum number of suggestions
+&nbsp;    // I&#39;m not sure why we&#39;re required to store this as a member variable of this
+&nbsp;    // class because it is not used. The AutoCompleteGUI actually sorts the list
+&nbsp;    // and truncates it based on the value of k, so there&#39;s nothing to do with it here.
+&nbsp;    // Probably an oversight on the part of whoever designed this assignment
+&nbsp;    int k;
+&nbsp;
+<b class="nc">&nbsp;    public Autocomplete() {</b>
+<b class="nc">&nbsp;        root = new Node();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addWord(String word, long weight) {
+<b class="nc">&nbsp;        if (!isValidWord(word)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        word = word.toLowerCase();</b>
+<b class="nc">&nbsp;        System.out.println(&quot;🌲 Adding word to trie: &quot; + word);</b>
+<b class="nc">&nbsp;        Node currentNode = root;</b>
+<b class="nc">&nbsp;        currentNode.incrementPrefixes();</b>
+&nbsp;
+&nbsp;        // Useful for debugging
+<b class="nc">&nbsp;        String partialWord = &quot;&quot;;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; word.length(); i++) {</b>
+&nbsp;            // This gets the index into the Node&#39;s references array
+<b class="nc">&nbsp;            int currentCharacter = word.charAt(i) - &#39;a&#39;;</b>
+<b class="nc">&nbsp;            partialWord += word.charAt(i);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (currentNode.getReferences()[currentCharacter] == null) {</b>
+<b class="nc">&nbsp;                currentNode.getReferences()[currentCharacter] = new Node();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // If this is the last character of the word, that means we have a complete word
+<b class="nc">&nbsp;            if (i == word.length() - 1) {</b>
+<b class="nc">&nbsp;                assert(currentNode.getReferences()[currentCharacter] != null);</b>
+&nbsp;                // Node already exists at this point, so mark it as a complete word
+<b class="nc">&nbsp;                Term t = new Term(word, weight);</b>
+<b class="nc">&nbsp;                currentNode.getReferences()[currentCharacter].setTerm(t);</b>
+<b class="nc">&nbsp;                currentNode.getReferences()[currentCharacter].setWords(1);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            currentNode.getReferences()[currentCharacter].incrementPrefixes();</b>
+<b class="nc">&nbsp;            currentNode = currentNode.getReferences()[currentCharacter];</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Node buildTrie(String filename, int k) {
+<b class="nc">&nbsp;        this.k = k;</b>
+&nbsp;        // Read from the file, one line at a time
+&nbsp;        BufferedReader br;
+&nbsp;        try {
+<b class="nc">&nbsp;            br = new BufferedReader(new FileReader(filename));</b>
+&nbsp;        } catch (FileNotFoundException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String line;
+&nbsp;        try {
+<b class="nc">&nbsp;            while((line = br.readLine()) != null) {</b>
+<b class="nc">&nbsp;                line = line.toLowerCase().trim();</b>
+&nbsp;
+&nbsp;                // Each line should be a numerical weight and the String value
+<b class="nc">&nbsp;                String[] parts = line.split(&quot;\\s+&quot;);</b>
+<b class="nc">&nbsp;                if (parts.length != 2) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                addWord(parts[1], Long.parseLong(parts[0]));</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return root;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Node getSubTrie(String prefix) {
+<b class="nc">&nbsp;        prefix = prefix.toLowerCase();</b>
+<b class="nc">&nbsp;        Node currentNode = root;</b>
+&nbsp;
+<b class="nc">&nbsp;        for(int i = 0; i &lt; prefix.length(); i++) {</b>
+<b class="nc">&nbsp;            int currentCharacter = prefix.charAt(i) - &#39;a&#39;;</b>
+<b class="nc">&nbsp;            currentNode = currentNode.getReferences()[currentCharacter];</b>
+<b class="nc">&nbsp;            if (currentNode == null) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return currentNode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int countPrefixes(String prefix) {
+<b class="nc">&nbsp;        Node subTrie = getSubTrie(prefix);</b>
+<b class="nc">&nbsp;        if (subTrie == null) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return subTrie.getPrefixes();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;ITerm&gt; getSuggestions(String prefix) {
+<b class="nc">&nbsp;        List&lt;ITerm&gt; suggestions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Node currentNode = getSubTrie(prefix);</b>
+<b class="nc">&nbsp;        if (currentNode == null) {</b>
+<b class="nc">&nbsp;            return suggestions;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        getSuggestionsHelper(currentNode, suggestions);</b>
+<b class="nc">&nbsp;        return suggestions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recursively populate the list with complete words as we do a depth-first-search
+&nbsp;     * of the Trie starting at the given node.
+&nbsp;     *
+&nbsp;     * @param currentNode The root of the subtrie
+&nbsp;     * @param suggestions The running list of terms to suggest
+&nbsp;     */
+&nbsp;    private void getSuggestionsHelper(Node currentNode, List&lt;ITerm&gt; suggestions) {
+<b class="nc">&nbsp;        if (currentNode == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (currentNode.isCompleteWord()) {</b>
+<b class="nc">&nbsp;            suggestions.add(currentNode.getCopyTerm());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Node child : currentNode.getReferences()) {</b>
+<b class="nc">&nbsp;            if (child == null) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            getSuggestionsHelper(child, suggestions);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isValidWord(String word) {
+&nbsp;        // String is one or more alphabetic characters
+<b class="nc">&nbsp;        return word.matches(&quot;[a-zA-Z]+&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

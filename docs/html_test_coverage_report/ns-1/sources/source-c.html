@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Node</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: Node (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Node</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/**
+&nbsp; * @author Harry Smith
+&nbsp; */
+&nbsp;
+&nbsp;public class Node {
+&nbsp;
+&nbsp;    public static final int NUM_CHILDREN = 26;
+&nbsp;
+&nbsp;    private Term term;
+&nbsp;
+&nbsp;    // Indicates whether this Node represents a complete word
+&nbsp;    // If all input words are unique, then this is essentially a boolean
+&nbsp;    // 0 if it is not a complete word, 1 if it is
+&nbsp;    private int words;
+&nbsp;
+&nbsp;    // How many words have the prefix of the node
+&nbsp;    private int prefixes;
+&nbsp;
+&nbsp;    // References to this Node&#39;s children
+&nbsp;    // For simple words, there will be up to 26 children
+&nbsp;    // for each letter of the alphabet
+&nbsp;    private Node[] references;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize a Node with an empty string and 0 weight; useful for
+&nbsp;     * writing tests.
+&nbsp;     */
+<b class="nc">&nbsp;    public Node() {</b>
+&nbsp;        // This is used for nodes that do not correspond to a complete word
+<b class="nc">&nbsp;        this.term = new Term(&quot;&quot;, 0);</b>
+<b class="nc">&nbsp;        this.references = new Node[NUM_CHILDREN];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize a Node with the given query string and weight.
+&nbsp;     * @throws IllegalArgumentException if query is null or if weight is negative.
+&nbsp;     */
+<b class="nc">&nbsp;    public Node (String query, long weight) {</b>
+<b class="nc">&nbsp;        this.term = new Term(query, weight);</b>
+<b class="nc">&nbsp;        this.references = new Node[NUM_CHILDREN];</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Term getTerm() {
+<b class="nc">&nbsp;        return term;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTerm(Term term) {
+<b class="nc">&nbsp;        this.term = term;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getWords() {
+<b class="nc">&nbsp;        return words;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWords(int words) {
+<b class="nc">&nbsp;        this.words = words;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getPrefixes() {
+<b class="nc">&nbsp;        return prefixes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPrefixes(int prefixes) {
+<b class="nc">&nbsp;        this.prefixes = prefixes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Node[] getReferences() {
+<b class="nc">&nbsp;        return references;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setReferences(Node[] references) {
+<b class="nc">&nbsp;        this.references = references;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void incrementPrefixes() {
+<b class="nc">&nbsp;        prefixes += 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCompleteWord() {
+<b class="nc">&nbsp;        return words &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ITerm getCopyTerm() {
+<b class="nc">&nbsp;        return new Term(term.getTerm(), term.getWeight());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

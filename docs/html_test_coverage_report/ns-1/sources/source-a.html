@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IndexUtilsTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IndexUtilsTest (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IndexUtilsTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.*;
+&nbsp;
+<b class="fc">&nbsp;class IndexUtilsTest {</b>
+&nbsp;    @Test
+&nbsp;    void testGetUniqueWords() {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = Map.ofEntries(</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d1&quot;, Arrays.asList(&quot;hello&quot;, &quot;world&quot;, &quot;how&quot;, &quot;are&quot;, &quot;you&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d2&quot;, Arrays.asList(&quot;hello&quot;, &quot;you&quot;, &quot;there&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d3&quot;, Arrays.asList(&quot;goodbye&quot;, &quot;world&quot;, &quot;see&quot;, &quot;you&quot;, &quot;later&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        Set&lt;String&gt; uniqueWords = IndexUtils.getUniqueWords(docs);</b>
+<b class="fc">&nbsp;        assertEquals(9, uniqueWords.size());</b>
+&nbsp;
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;hello&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;world&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;how&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;are&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;you&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;there&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;goodbye&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;see&quot;));</b>
+<b class="fc">&nbsp;        assertTrue(uniqueWords.contains(&quot;later&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testGetInverseDocumentFrequencies() {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = Map.ofEntries(</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d1&quot;, Arrays.asList(&quot;hello&quot;, &quot;world&quot;, &quot;how&quot;, &quot;are&quot;, &quot;you&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d2&quot;, Arrays.asList(&quot;hello&quot;, &quot;you&quot;, &quot;there&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d3&quot;, Arrays.asList(&quot;goodbye&quot;, &quot;world&quot;, &quot;see&quot;, &quot;you&quot;, &quot;later&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; inverseDocumentFrequencies = IndexUtils.getInverseDocumentFrequencies(docs);</b>
+<b class="fc">&nbsp;        assertEquals(9, inverseDocumentFrequencies.size());</b>
+&nbsp;
+&nbsp;        // IDF(&quot;hello&quot;) = log(3/2)
+<b class="fc">&nbsp;        assertTrue(inverseDocumentFrequencies.containsKey(&quot;hello&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.405, inverseDocumentFrequencies.get(&quot;hello&quot;), 0.001);</b>
+&nbsp;
+&nbsp;        // IDF(&quot;goodbye&quot;) = log(3/1)
+<b class="fc">&nbsp;        assertTrue(inverseDocumentFrequencies.containsKey(&quot;goodbye&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(1.098, inverseDocumentFrequencies.get(&quot;goodbye&quot;), 0.001);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    void testGetTFIDF() {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = Map.ofEntries(</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d1&quot;, Arrays.asList(&quot;hello&quot;, &quot;world&quot;, &quot;how&quot;, &quot;are&quot;, &quot;you&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d2&quot;, Arrays.asList(&quot;hello&quot;, &quot;you&quot;, &quot;there&quot;)),</b>
+<b class="fc">&nbsp;                Map.entry(&quot;d3&quot;, Arrays.asList(&quot;goodbye&quot;, &quot;world&quot;, &quot;see&quot;, &quot;you&quot;, &quot;later&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; tfidf = IndexUtils.calculateTFIDF(docs);</b>
+<b class="fc">&nbsp;        assertEquals(3, tfidf.size());</b>
+<b class="fc">&nbsp;        assertTrue(tfidf.containsKey(&quot;d1&quot;));</b>
+&nbsp;
+&nbsp;        // 0/5 * ln(3/1)
+<b class="fc">&nbsp;        assertEquals(0.0, tfidf.get(&quot;d1&quot;).get(&quot;goodbye&quot;), 0.001);</b>
+&nbsp;
+&nbsp;        // 1/5 * ln(3/2)
+<b class="fc">&nbsp;        assertEquals(0.2 * 0.405, tfidf.get(&quot;d1&quot;).get(&quot;hello&quot;), 0.001);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

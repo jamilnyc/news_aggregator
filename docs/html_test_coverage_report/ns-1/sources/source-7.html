@@ -1,0 +1,398 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IndexBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IndexBuilder (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IndexBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.8%
+  </span>
+  <span class="absValue">
+    (31/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.7%
+  </span>
+  <span class="absValue">
+    (82/98)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">IndexBuilder$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">IndexBuilder$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (33/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.9%
+  </span>
+  <span class="absValue">
+    (90/106)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import org.jsoup.HttpStatusException;
+&nbsp;import org.jsoup.Jsoup;
+&nbsp;import org.jsoup.nodes.Document;
+&nbsp;import org.jsoup.nodes.Element;
+&nbsp;import org.jsoup.select.Elements;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.*;
+&nbsp;
+<b class="fc">&nbsp;public class IndexBuilder implements IIndexBuilder {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, List&lt;String&gt;&gt; parseFeed(List&lt;String&gt; feeds) {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (String rssUrl : feeds) {</b>
+&nbsp;            Document rssDoc;
+&nbsp;            try {
+&nbsp;                // Fetch the RSS document by URL
+<b class="fc">&nbsp;                System.out.println(&quot;Fetching RSS Feed: &quot; + rssUrl);</b>
+<b class="fc">&nbsp;                rssDoc = Jsoup.connect(rssUrl).get();</b>
+&nbsp;            } catch (IOException e) {
+<b class="fc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Extract all the &lt;link&gt; tags in the RSS feed
+<b class="fc">&nbsp;            Elements links = rssDoc.getElementsByTag(&quot;link&quot;);</b>
+<b class="fc">&nbsp;            for (Element link : links) {</b>
+<b class="fc">&nbsp;                String htmlUrl = link.text();</b>
+&nbsp;                Document htmlDoc;
+&nbsp;                try {
+<b class="fc">&nbsp;                    System.out.println(&quot;Fetching HTML Document: &quot; + htmlUrl);</b>
+<b class="fc">&nbsp;                    htmlDoc = Jsoup.connect(htmlUrl).get();</b>
+&nbsp;                } catch (IOException e) {
+&nbsp;                    // Skip articles that time out.
+<b class="nc">&nbsp;                    if (e instanceof java.net.SocketException</b>
+&nbsp;                    || e instanceof java.net.SocketTimeoutException) {
+<b class="nc">&nbsp;                        System.err.println(&quot;Skipping document due to a socket error&quot;);</b>
+&nbsp;                        continue;
+&nbsp;                    }
+&nbsp;
+&nbsp;                    // Skip documents that are not found or not permitted
+<b class="nc">&nbsp;                    if (e instanceof HttpStatusException) {</b>
+<b class="nc">&nbsp;                        List&lt;Integer&gt; skippableCodes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                        skippableCodes.add(403);</b>
+<b class="nc">&nbsp;                        skippableCodes.add(404);</b>
+<b class="nc">&nbsp;                        int statusCode = ((HttpStatusException) e).getStatusCode();</b>
+<b class="nc">&nbsp;                        if (skippableCodes.contains(statusCode)) {</b>
+<b class="nc">&nbsp;                            System.err.println(&quot;Skipping document due HTTP status code: &quot; + statusCode);</b>
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    throw new RuntimeException(e);</b>
+&nbsp;                }
+&nbsp;
+<b class="fc">&nbsp;                Elements bodies = htmlDoc.getElementsByTag(&quot;body&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;                List&lt;String&gt; words = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;                for (Element body : bodies) {</b>
+<b class="fc">&nbsp;                    String contents = body.text();</b>
+<b class="fc">&nbsp;                    List&lt;String&gt; tokens = StringUtils.tokenize(contents);</b>
+<b class="fc">&nbsp;                    words.addAll(tokens);</b>
+&nbsp;                }
+<b class="fc">&nbsp;                System.out.println(&quot;Found &quot; + words.size() + &quot; words&quot;);</b>
+<b class="fc">&nbsp;                docs.put(htmlUrl, words);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            System.out.println(&quot;✅ Finished parsing RSS Feed: &quot; + rssUrl);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return docs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, Map&lt;String, Double&gt;&gt; buildIndex(Map&lt;String, List&lt;String&gt;&gt; docs) {
+<b class="fc">&nbsp;        System.out.println(&quot;Starting to build an index with &quot; + docs.size() + &quot; documents&quot;);</b>
+<b class="fc">&nbsp;        return IndexUtils.calculateTFIDF(docs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;?, ?&gt; buildInvertedIndex(Map&lt;String, Map&lt;String, Double&gt;&gt; index) {
+<b class="fc">&nbsp;        System.out.println(&quot;Starting to build an Inverted Index&quot;);</b>
+&nbsp;        // Word -&gt; List&lt;Entry&lt;DocumentName, TFIDF&gt;&gt;
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; invertedIndex = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, Map&lt;String, Double&gt;&gt; entry : index.entrySet()) {</b>
+<b class="fc">&nbsp;            String documentName = entry.getKey();</b>
+<b class="fc">&nbsp;            Map&lt;String, Double&gt; documentTFIDF = entry.getValue();</b>
+<b class="fc">&nbsp;            System.out.println(&quot;  Words: &quot; + documentTFIDF.size() + &quot; | &quot; + documentName);</b>
+&nbsp;
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, Double&gt; tfidfEntry : documentTFIDF.entrySet()) {</b>
+<b class="fc">&nbsp;                String word = tfidfEntry.getKey();</b>
+<b class="fc">&nbsp;                double tfidf = tfidfEntry.getValue();</b>
+&nbsp;
+<b class="fc">&nbsp;                if (!invertedIndex.containsKey(word)) {</b>
+<b class="fc">&nbsp;                    invertedIndex.put(word, new ArrayList&lt;&gt;());</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // Only include documents that are actually relevant to the current term
+&nbsp;                // When a TFIDF score is 0, then it means the term does not appear in a particular document
+<b class="fc">&nbsp;                if (tfidf &gt; 0) {</b>
+<b class="fc">&nbsp;                    invertedIndex.get(word).add(new AbstractMap.SimpleEntry&lt;&gt;(documentName, tfidf));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Sort the lists so that the documents with the highest TFIDF are at the top
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; entry : invertedIndex.entrySet()) {</b>
+<b class="fc">&nbsp;            String word = entry.getKey();</b>
+<b class="fc">&nbsp;            List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt; tfidfValues = entry.getValue();</b>
+&nbsp;
+<b class="fc">&nbsp;            System.out.println(&quot;  Sorting results for term &quot; + word);</b>
+<b class="fc">&nbsp;            Collections.sort(tfidfValues, new Comparator&lt;AbstractMap.SimpleEntry&gt;() {</b>
+&nbsp;                public int compare(AbstractMap.SimpleEntry o1, AbstractMap.SimpleEntry o2) {
+<b class="fc">&nbsp;                    double v1 = ((Number) o1.getValue()).doubleValue();</b>
+<b class="fc">&nbsp;                    double v2 = ((Number) o2.getValue()).doubleValue();</b>
+&nbsp;
+<b class="fc">&nbsp;                    return Double.compare(v2, v1);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return invertedIndex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;Map.Entry&lt;String, List&lt;String&gt;&gt;&gt; buildHomePage(Map&lt;?, ?&gt; invertedIndex) {
+<b class="fc">&nbsp;        System.out.println(&quot;🏠 Starting to build home page&quot;);</b>
+&nbsp;        // Remove terms that are stop words
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; trueInvertedIndex = (Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt;) invertedIndex;</b>
+<b class="fc">&nbsp;        Arrays.asList(STOPW).forEach(trueInvertedIndex.keySet()::remove);</b>
+&nbsp;
+&nbsp;        // For the remaining terms, remove documents that have a 0 TFIDF score
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; entry : trueInvertedIndex.entrySet()) {</b>
+<b class="fc">&nbsp;            String word = entry.getKey();</b>
+<b class="fc">&nbsp;            List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt; tfidf = entry.getValue();</b>
+<b class="pc">&nbsp;            tfidf.removeIf(t -&gt; t.getValue() &lt;= 0.0);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Terms to list of associated articles
+<b class="fc">&nbsp;        List&lt;Map.Entry&lt;String, List&lt;String&gt;&gt;&gt; cleaned = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (Map.Entry&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; entry : trueInvertedIndex.entrySet()) {</b>
+<b class="fc">&nbsp;            String word = entry.getKey();</b>
+<b class="fc">&nbsp;            List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt; tfidf = entry.getValue();</b>
+<b class="fc">&nbsp;            List&lt;String&gt; documents = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;            for (AbstractMap.SimpleEntry&lt;String, Double&gt; tfidfEntry : tfidf) {</b>
+<b class="fc">&nbsp;                documents.add(tfidfEntry.getKey());</b>
+&nbsp;            }
+<b class="fc">&nbsp;            cleaned.add(new AbstractMap.SimpleEntry&lt;&gt;(word, documents));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Tag terms are sorted by the number of articles (descending), then by reverse lexicographic order
+<b class="fc">&nbsp;        Collections.sort(cleaned, new Comparator&lt;&gt;() {</b>
+&nbsp;            public int compare(Map.Entry&lt;String, List&lt;String&gt;&gt; o1, Map.Entry&lt;String, List&lt;String&gt;&gt; o2) {
+<b class="fc">&nbsp;                if (o1.getValue().size() == o2.getValue().size()) {</b>
+<b class="fc">&nbsp;                    return o2.getKey().compareTo(o1.getKey());</b>
+&nbsp;                }
+<b class="fc">&nbsp;                return o2.getValue().size() - o1.getValue().size();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="fc">&nbsp;        return cleaned;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Collection&lt;?&gt; createAutocompleteFile(Collection&lt;Map.Entry&lt;String, List&lt;String&gt;&gt;&gt; homepage) {
+<b class="fc">&nbsp;        System.out.println(&quot;Starting creating the autocomplete file&quot;);</b>
+&nbsp;        File autocompleteFile;
+<b class="fc">&nbsp;        List&lt;String&gt; words = new ArrayList&lt;&gt;();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            autocompleteFile = new File(&quot;autocomplete.txt&quot;);</b>
+<b class="fc">&nbsp;            Files.deleteIfExists(autocompleteFile.toPath());</b>
+<b class="pc">&nbsp;            if (!autocompleteFile.createNewFile()) {</b>
+<b class="nc">&nbsp;                System.err.println(&quot;Could not create autocomplete file.&quot;);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : homepage) {</b>
+<b class="fc">&nbsp;                String word = entry.getKey();</b>
+<b class="fc">&nbsp;                words.add(word);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            Collections.sort(words);</b>
+&nbsp;
+<b class="fc">&nbsp;            FileWriter fw = new FileWriter(autocompleteFile);</b>
+<b class="fc">&nbsp;            fw.write(homepage.size() + &quot;\n&quot;);</b>
+<b class="fc">&nbsp;            for (String word : words) {</b>
+<b class="fc">&nbsp;                fw.write(&quot;    &quot; + 0 + &quot; &quot; + word + &quot;\n&quot;);</b>
+&nbsp;            }
+&nbsp;            fw.close();
+<b class="fc">&nbsp;            System.out.println(&quot;📝 Finished writing to autocomplete.txt&quot;);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            System.err.println(&quot;Could not create autocomplete file.&quot;);</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return words;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; searchArticles(String queryTerm, Map&lt;?, ?&gt; invertedIndex) {
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; trueInvertedIndex = (Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt;) invertedIndex;</b>
+<b class="fc">&nbsp;        List&lt;String&gt; matchingArticles = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt; termsToArticles = trueInvertedIndex.get(queryTerm);</b>
+&nbsp;
+&nbsp;        // If there are no articles for a given term, then it is likely
+&nbsp;        // that the index was not built entirely.
+<b class="pc">&nbsp;        if (termsToArticles == null) {</b>
+<b class="nc">&nbsp;            System.err.println(&quot;Term &quot; + queryTerm + &quot; not found. Did you build the whole index?&quot;);</b>
+<b class="nc">&nbsp;            return matchingArticles;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        for(AbstractMap.SimpleEntry&lt;String, Double&gt; entry : termsToArticles) {</b>
+<b class="fc">&nbsp;            matchingArticles.add(entry.getKey());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;🔎 Search for &#39;&quot; + queryTerm + &quot;&#39;: &quot; + matchingArticles.size() + &quot; results&quot;);</b>
+<b class="fc">&nbsp;        return matchingArticles;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

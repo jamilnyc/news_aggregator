@@ -1,0 +1,129 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IAutocomplete</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IAutocomplete (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">IAutocomplete</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import java.util.List;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author ericfouh
+&nbsp; */
+&nbsp;public interface IAutocomplete
+&nbsp;{
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds a new word with its associated weight to the Trie.
+&nbsp;     * If the word contains an invalid character, simply do nothing.
+&nbsp;     * 
+&nbsp;     * @param word the word to be added to the Trie
+&nbsp;     * @param weight the weight of the word
+&nbsp;     */
+&nbsp;    public void addWord(String word, long weight);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes the Trie
+&nbsp;     *
+&nbsp;     * @param filename the file to read all the autocomplete data from each line
+&nbsp;     *                 contains a word and its weight This method will call the
+&nbsp;     *                 addWord method
+&nbsp;     * @param k the maximum number of suggestions that should be displayed 
+&nbsp;     * @return the root of the Trie You might find the readLine() method in
+&nbsp;     *         BufferedReader useful in this situation as it will allow you to
+&nbsp;     *         read a file one line at a time.
+&nbsp;     */
+&nbsp;    public Node buildTrie(String filename, int k);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param prefix
+&nbsp;     * @return the root of the subTrie corresponding to the last character of
+&nbsp;     *         the prefix. If the prefix is not represented in the trie, return null.
+&nbsp;     */
+&nbsp;    public Node getSubTrie(String prefix);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param prefix
+&nbsp;     * @return the number of words that start with prefix.
+&nbsp;     */
+&nbsp;    public int countPrefixes(String prefix);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method should not throw an exception.
+&nbsp;     * Make sure that you preserve encapsulation by returning a list of copies of the
+&nbsp;     * original Terms; otherwise, the user might be able to change the structure of your
+&nbsp;     * Trie based on the values returned.
+&nbsp;     *
+&nbsp;     * @param prefix
+&nbsp;     * @return a List containing all the ITerm objects with query starting with
+&nbsp;     *         prefix. Return an empty list if there are no ITerm object starting
+&nbsp;     *         with prefix.
+&nbsp;     */
+&nbsp;    public List&lt;ITerm&gt; getSuggestions(String prefix);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

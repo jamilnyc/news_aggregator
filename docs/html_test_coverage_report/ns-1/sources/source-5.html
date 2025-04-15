@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IIndexBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IIndexBuilder (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IIndexBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;/**
+&nbsp; * @author ericfouh
+&nbsp; */
+&nbsp;public interface IIndexBuilder
+&nbsp;{
+&nbsp;    /**
+&nbsp;     * &lt;parseFeed&gt; Parse each document/rss feed in the list and return a Map of
+&nbsp;     * each document and all the words in it. (punctuation and special
+&nbsp;     * characters removed)
+&nbsp;     * 
+&nbsp;     * @param feeds a List of rss feeds to parse
+&nbsp;     * @return a Map of each documents (identified by its url) and the list of
+&nbsp;     *         words in it.
+&nbsp;     */
+&nbsp;    public Map&lt;String, List&lt;String&gt;&gt; parseFeed(List&lt;String&gt; feeds);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param docs a map computed by {@parseFeed}
+&nbsp;     * @return the forward index: a map of all documents and their 
+&nbsp;     *         tags/keywords. the key is the document, the value is a 
+&nbsp;     *         map of a tag term and its TFIDF value. 
+&nbsp;     *         The values (Map&lt;String, Double&gt;) are sorted
+&nbsp;     *         by lexicographic order on the key (tag term)
+&nbsp;     *  
+&nbsp;     */
+&nbsp;    public Map&lt;String, Map&lt;String, Double&gt;&gt; buildIndex(
+&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Build an inverted index consisting of a map of each tag term and a Collection (Java)
+&nbsp;     * of Entry objects mapping a document with the TFIDF value of the term 
+&nbsp;     * (for that document)
+&nbsp;     * The Java collection (value) is sorted by reverse tag term TFIDF value 
+&nbsp;     * (the document in which a term has the
+&nbsp;     * highest TFIDF should be listed first).
+&nbsp;     * 
+&nbsp;     * 
+&nbsp;     * @param index the index computed by {@buildIndex}
+&nbsp;     * @return inverted index - a sorted Map of the documents in which term is a keyword
+&nbsp;     */
+&nbsp;
+&nbsp;    public Map&lt;?, ?&gt; buildInvertedIndex(Map&lt;String, Map&lt;String, Double&gt;&gt; index);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param invertedIndex
+&nbsp;     * @return a sorted collection of terms and articles Entries are sorted by
+&nbsp;     *         number of articles. If two terms have the same number of 
+&nbsp;     *         articles, then they should be sorted by reverse lexicographic order.
+&nbsp;     *         The Entry class is the Java abstract data type
+&nbsp;     *         implementation of a tuple
+&nbsp;     *         https://docs.oracle.com/javase/9/docs/api/java/util/Map.Entry.html
+&nbsp;     *         One useful implementation class of Entry is
+&nbsp;     *         AbstractMap.SimpleEntry
+&nbsp;     *         https://docs.oracle.com/javase/9/docs/api/java/util/AbstractMap.SimpleEntry.html
+&nbsp;     */
+&nbsp;    public Collection&lt;Entry&lt;String, List&lt;String&gt;&gt;&gt; buildHomePage(
+&nbsp;        Map&lt;?, ?&gt; invertedIndex);
+&nbsp;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a file containing all the words in the inverted index. Each word
+&nbsp;     * should occupy a line Words should be written in lexicographic order
+&nbsp;     * assign a weight of 0 to each word. The method must store the words into a 
+&nbsp;     * file named autocomplete.txt
+&nbsp;     * 
+&nbsp;     * @param homepage the collection used to generate the homepage (buildHomePage)
+&nbsp;     * @return A collection containing all the words written into the file sorted by lexicographic order
+&nbsp;     */
+&nbsp;    public Collection&lt;?&gt; createAutocompleteFile(Collection&lt;Entry&lt;String, List&lt;String&gt;&gt;&gt; homepage); 
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param queryTerm
+&nbsp;     * @param invertedIndex
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; searchArticles(
+&nbsp;        String queryTerm,
+&nbsp;        Map&lt;?, ?&gt; invertedIndex);
+&nbsp;
+&nbsp;    // Stop words
+<b class="fc">&nbsp;    public static String[] STOPW = { &quot;a&quot;, &quot;about&quot;, &quot;above&quot;, &quot;across&quot;,</b>
+&nbsp;        &quot;after&quot;, &quot;afterwards&quot;, &quot;again&quot;, &quot;against&quot;, &quot;all&quot;, &quot;almost&quot;, &quot;alone&quot;,
+&nbsp;        &quot;along&quot;, &quot;already&quot;, &quot;also&quot;, &quot;although&quot;, &quot;always&quot;, &quot;am&quot;, &quot;among&quot;,
+&nbsp;        &quot;amongst&quot;, &quot;amoungst&quot;, &quot;amount&quot;, &quot;an&quot;, &quot;and&quot;, &quot;another&quot;, &quot;any&quot;,
+&nbsp;        &quot;anyhow&quot;, &quot;anyone&quot;, &quot;anything&quot;, &quot;anyway&quot;, &quot;anywhere&quot;, &quot;are&quot;, &quot;around&quot;,
+&nbsp;        &quot;as&quot;, &quot;at&quot;, &quot;back&quot;, &quot;be&quot;, &quot;became&quot;, &quot;because&quot;, &quot;become&quot;, &quot;becomes&quot;,
+&nbsp;        &quot;becoming&quot;, &quot;been&quot;, &quot;before&quot;, &quot;beforehand&quot;, &quot;behind&quot;, &quot;being&quot;, &quot;below&quot;,
+&nbsp;        &quot;beside&quot;, &quot;besides&quot;, &quot;between&quot;, &quot;beyond&quot;, &quot;bill&quot;, &quot;both&quot;, &quot;bottom&quot;,
+&nbsp;        &quot;but&quot;, &quot;by&quot;, &quot;call&quot;, &quot;can&quot;, &quot;cannot&quot;, &quot;cant&quot;, &quot;co&quot;, &quot;computer&quot;, &quot;con&quot;,
+&nbsp;        &quot;could&quot;, &quot;couldnt&quot;, &quot;cry&quot;, &quot;de&quot;, &quot;describe&quot;, &quot;detail&quot;, &quot;do&quot;, &quot;done&quot;,
+&nbsp;        &quot;down&quot;, &quot;due&quot;, &quot;during&quot;, &quot;each&quot;, &quot;eg&quot;, &quot;eight&quot;, &quot;either&quot;, &quot;eleven&quot;,
+&nbsp;        &quot;else&quot;, &quot;elsewhere&quot;, &quot;empty&quot;, &quot;enough&quot;, &quot;etc&quot;, &quot;even&quot;, &quot;ever&quot;, &quot;every&quot;,
+&nbsp;        &quot;everyone&quot;, &quot;everything&quot;, &quot;everywhere&quot;, &quot;except&quot;, &quot;few&quot;, &quot;fifteen&quot;,
+&nbsp;        &quot;fify&quot;, &quot;fill&quot;, &quot;find&quot;, &quot;fire&quot;, &quot;first&quot;, &quot;five&quot;, &quot;for&quot;, &quot;former&quot;,
+&nbsp;        &quot;formerly&quot;, &quot;forty&quot;, &quot;found&quot;, &quot;four&quot;, &quot;from&quot;, &quot;front&quot;, &quot;full&quot;,
+&nbsp;        &quot;further&quot;, &quot;get&quot;, &quot;give&quot;, &quot;go&quot;, &quot;had&quot;, &quot;has&quot;, &quot;hasnt&quot;, &quot;have&quot;, &quot;he&quot;,
+&nbsp;        &quot;hence&quot;, &quot;her&quot;, &quot;here&quot;, &quot;hereafter&quot;, &quot;hereby&quot;, &quot;herein&quot;, &quot;hereupon&quot;,
+&nbsp;        &quot;hers&quot;, &quot;herse&quot;, &quot;him&quot;, &quot;himse&quot;, &quot;his&quot;, &quot;how&quot;, &quot;however&quot;, &quot;hundred&quot;,
+&nbsp;        &quot;i&quot;, &quot;ie&quot;, &quot;if&quot;, &quot;in&quot;, &quot;inc&quot;, &quot;indeed&quot;, &quot;interest&quot;, &quot;into&quot;, &quot;is&quot;, &quot;it&quot;,
+&nbsp;        &quot;its&quot;, &quot;itse&quot;, &quot;keep&quot;, &quot;last&quot;, &quot;latter&quot;, &quot;latterly&quot;, &quot;least&quot;, &quot;less&quot;,
+&nbsp;        &quot;ltd&quot;, &quot;made&quot;, &quot;many&quot;, &quot;may&quot;, &quot;me&quot;, &quot;meanwhile&quot;, &quot;might&quot;, &quot;mill&quot;,
+&nbsp;        &quot;mine&quot;, &quot;more&quot;, &quot;moreover&quot;, &quot;most&quot;, &quot;mostly&quot;, &quot;move&quot;, &quot;much&quot;, &quot;must&quot;,
+&nbsp;        &quot;my&quot;, &quot;myse&quot;, &quot;name&quot;, &quot;namely&quot;, &quot;neither&quot;, &quot;never&quot;, &quot;nevertheless&quot;,
+&nbsp;        &quot;next&quot;, &quot;nine&quot;, &quot;no&quot;, &quot;nobody&quot;, &quot;none&quot;, &quot;noone&quot;, &quot;nor&quot;, &quot;not&quot;,
+&nbsp;        &quot;nothing&quot;, &quot;now&quot;, &quot;nowhere&quot;, &quot;of&quot;, &quot;off&quot;, &quot;often&quot;, &quot;on&quot;, &quot;once&quot;, &quot;one&quot;,
+&nbsp;        &quot;only&quot;, &quot;onto&quot;, &quot;or&quot;, &quot;other&quot;, &quot;others&quot;, &quot;otherwise&quot;, &quot;our&quot;, &quot;ours&quot;,
+&nbsp;        &quot;ourselves&quot;, &quot;out&quot;, &quot;over&quot;, &quot;own&quot;, &quot;part&quot;, &quot;per&quot;, &quot;perhaps&quot;, &quot;please&quot;,
+&nbsp;        &quot;put&quot;, &quot;rather&quot;, &quot;re&quot;, &quot;same&quot;, &quot;see&quot;, &quot;seem&quot;, &quot;seemed&quot;, &quot;seeming&quot;,
+&nbsp;        &quot;seems&quot;, &quot;serious&quot;, &quot;several&quot;, &quot;she&quot;, &quot;should&quot;, &quot;show&quot;, &quot;side&quot;, &quot;since&quot;,
+&nbsp;        &quot;sincere&quot;, &quot;six&quot;, &quot;sixty&quot;, &quot;so&quot;, &quot;some&quot;, &quot;somehow&quot;, &quot;someone&quot;,
+&nbsp;        &quot;something&quot;, &quot;sometime&quot;, &quot;sometimes&quot;, &quot;somewhere&quot;, &quot;still&quot;, &quot;such&quot;,
+&nbsp;        &quot;system&quot;, &quot;take&quot;, &quot;ten&quot;, &quot;than&quot;, &quot;that&quot;, &quot;the&quot;, &quot;their&quot;, &quot;them&quot;,
+&nbsp;        &quot;themselves&quot;, &quot;then&quot;, &quot;thence&quot;, &quot;there&quot;, &quot;thereafter&quot;, &quot;thereby&quot;,
+&nbsp;        &quot;therefore&quot;, &quot;therein&quot;, &quot;thereupon&quot;, &quot;these&quot;, &quot;they&quot;, &quot;thick&quot;, &quot;thin&quot;,
+&nbsp;        &quot;third&quot;, &quot;this&quot;, &quot;those&quot;, &quot;though&quot;, &quot;three&quot;, &quot;through&quot;, &quot;throughout&quot;,
+&nbsp;        &quot;thru&quot;, &quot;thus&quot;, &quot;to&quot;, &quot;together&quot;, &quot;too&quot;, &quot;top&quot;, &quot;toward&quot;, &quot;towards&quot;,
+&nbsp;        &quot;twelve&quot;, &quot;twenty&quot;, &quot;two&quot;, &quot;un&quot;, &quot;under&quot;, &quot;until&quot;, &quot;up&quot;, &quot;upon&quot;, &quot;us&quot;,
+&nbsp;        &quot;very&quot;, &quot;via&quot;, &quot;was&quot;, &quot;we&quot;, &quot;well&quot;, &quot;were&quot;, &quot;what&quot;, &quot;whatever&quot;, &quot;when&quot;,
+&nbsp;        &quot;whence&quot;, &quot;whenever&quot;, &quot;where&quot;, &quot;whereafter&quot;, &quot;whereas&quot;, &quot;whereby&quot;,
+&nbsp;        &quot;wherein&quot;, &quot;whereupon&quot;, &quot;wherever&quot;, &quot;whether&quot;, &quot;which&quot;, &quot;while&quot;,
+&nbsp;        &quot;whither&quot;, &quot;who&quot;, &quot;whoever&quot;, &quot;whole&quot;, &quot;whom&quot;, &quot;whose&quot;, &quot;why&quot;, &quot;will&quot;,
+&nbsp;        &quot;with&quot;, &quot;within&quot;, &quot;without&quot;, &quot;would&quot;, &quot;yet&quot;, &quot;you&quot;, &quot;your&quot;, &quot;yours&quot;,
+&nbsp;        &quot;yourself&quot;, &quot;yourselves&quot;, };
+<b class="fc">&nbsp;    public static HashSet&lt;String&gt; STOPWORDS = new HashSet&lt;&gt;(Arrays.asList(STOPW));</b>
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

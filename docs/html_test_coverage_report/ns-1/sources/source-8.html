@@ -1,0 +1,343 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IndexBuilderTest</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: IndexBuilderTest (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IndexBuilderTest</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.2%
+  </span>
+  <span class="absValue">
+    (111/113)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;import org.junit.jupiter.api.Test;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.*;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.*;
+&nbsp;
+<b class="fc">&nbsp;public class IndexBuilderTest {</b>
+&nbsp;    public static final String UPENN_RSS_URL = &quot;https://www.cis.upenn.edu/~cit5940/sample_rss_feed.xml&quot;;
+&nbsp;
+&nbsp;    private static String getUpennPageUrl(int pageNum) {
+<b class="fc">&nbsp;        return &quot;https://www.seas.upenn.edu/~cit5940/page&quot; + pageNum + &quot;.html&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testParseFeedWithValidRssUrl() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; result = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        assertEquals(5, result.size(), &quot;There should have been 5 links parsed&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        int[] pageNums = {1, 2, 3, 4, 5};</b>
+<b class="fc">&nbsp;        for (int pageNum : pageNums) {</b>
+<b class="fc">&nbsp;            assertTrue(result.containsKey(getUpennPageUrl(pageNum)), &quot;Page &quot; + pageNum + &quot; should have been parsed&quot;);</b>
+<b class="fc">&nbsp;            assertFalse(result.get(getUpennPageUrl(pageNum)).isEmpty(), &quot;Page &quot; + pageNum + &quot; should have words&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        assertEquals(10, result.get(getUpennPageUrl(1)).size());</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; expectedWords = new ArrayList&lt;&gt;(Arrays.asList(</b>
+&nbsp;            &quot;data&quot;,
+&nbsp;            &quot;structures&quot;,
+&nbsp;            &quot;linear&quot;,
+&nbsp;            &quot;data&quot;,
+&nbsp;            &quot;structures&quot;,
+&nbsp;            &quot;lists&quot;,
+&nbsp;            &quot;arraylist&quot;,
+&nbsp;            &quot;linkedlist&quot;,
+&nbsp;            &quot;stacks&quot;,
+&nbsp;            &quot;queues&quot;
+&nbsp;        ));
+<b class="fc">&nbsp;        assertEquals(expectedWords, result.get(getUpennPageUrl(1)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testParseFeedWithEmptyFeedList() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; result = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        assertEquals(0, result.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testParseFeedWithInvalidRssUrl() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(&quot;https://does.not.exist/feed.xml&quot;);</b>
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            Map&lt;String, List&lt;String&gt;&gt; result = ib.parseFeed(feeds);</b>
+<b class="nc">&nbsp;            fail(&quot;Should have thrown an exception when an invalid rss url is present&quot;);</b>
+&nbsp;        } catch (RuntimeException e) {
+<b class="fc">&nbsp;            assertTrue(e.getMessage().contains(&quot;UnknownHostException&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testBuildIndex() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; forwardIndex = ib.buildIndex(docs);</b>
+&nbsp;
+&nbsp;        // Testing known values for this set of documents, as defined in the spec
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; page1 = forwardIndex.get(getUpennPageUrl(1));</b>
+<b class="fc">&nbsp;        assertTrue(page1.containsKey(&quot;data&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.1021, page1.get(&quot;data&quot;), 0.001);</b>
+<b class="fc">&nbsp;        assertTrue(page1.containsKey(&quot;structures&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.183, page1.get(&quot;structures&quot;), 0.001);</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; page2 = forwardIndex.get(getUpennPageUrl(2));</b>
+<b class="fc">&nbsp;        assertTrue(page2.containsKey(&quot;data&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.046, page2.get(&quot;data&quot;), 0.001);</b>
+<b class="fc">&nbsp;        assertTrue(page2.containsKey(&quot;structures&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0666, page2.get(&quot;structures&quot;), 0.001);</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; page3 = forwardIndex.get(getUpennPageUrl(3));</b>
+<b class="fc">&nbsp;        assertTrue(page3.containsKey(&quot;trees&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0832, page3.get(&quot;trees&quot;), 0.001);</b>
+<b class="fc">&nbsp;        assertTrue(page3.containsKey(&quot;treeset&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0487, page3.get(&quot;treeset&quot;), 0.001);</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; page4 = forwardIndex.get(getUpennPageUrl(4));</b>
+<b class="fc">&nbsp;        assertTrue(page4.containsKey(&quot;mallarme&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0731, page4.get(&quot;mallarme&quot;), 0.001);</b>
+<b class="fc">&nbsp;        assertTrue(page4.containsKey(&quot;others&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0731, page4.get(&quot;others&quot;), 0.001);</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Double&gt; page5 = forwardIndex.get(getUpennPageUrl(5));</b>
+<b class="fc">&nbsp;        assertTrue(page5.containsKey(&quot;files&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0509, page5.get(&quot;files&quot;), 0.001);</b>
+<b class="fc">&nbsp;        assertTrue(page5.containsKey(&quot;completely&quot;));</b>
+<b class="fc">&nbsp;        assertEquals(0.0894, page5.get(&quot;completely&quot;), 0.001);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testBuildInvertedIndex() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; forwardIndex = ib.buildIndex(docs);</b>
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;?,?&gt; map = ib.buildInvertedIndex(forwardIndex);</b>
+&nbsp;        // Check the map keys and values are the right type before casting
+<b class="fc">&nbsp;        for (Map.Entry&lt;?, ?&gt; entry : map.entrySet()) {</b>
+<b class="fc">&nbsp;            assertInstanceOf(String.class, entry.getKey(), &quot;The map key should be a string&quot;);</b>
+<b class="fc">&nbsp;            assertInstanceOf(List.class, entry.getValue(), &quot;The map value should be a list&quot;);</b>
+<b class="fc">&nbsp;            assertInstanceOf(AbstractMap.SimpleEntry.class, ((List&lt;?&gt;) entry.getValue()).getFirst(), &quot;The list elements should be SimpleEntry&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; invertedIndex</b>
+&nbsp;                = (Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt;) map;
+&nbsp;
+&nbsp;        // Remove documents with 0 TFIDF scores
+<b class="fc">&nbsp;        assertEquals(2, invertedIndex.get(&quot;structures&quot;).size(), &quot;term &#39;structures&#39; should have a list of 2 documents with TFIDF scores&quot;);</b>
+&nbsp;
+&nbsp;        // The list should be sorted by the TFIDF of the tuple
+<b class="fc">&nbsp;        assertEquals(getUpennPageUrl(1), invertedIndex.get(&quot;structures&quot;).get(0).getKey(), &quot;Entries in the list should be sorted in descending order of TFIDF&quot;);</b>
+<b class="fc">&nbsp;        assertEquals(0.183, invertedIndex.get(&quot;structures&quot;).get(0).getValue(), 0.001);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testBuildHomePage() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; forwardIndex = ib.buildIndex(docs);</b>
+<b class="fc">&nbsp;        Map&lt;?,?&gt; map = ib.buildInvertedIndex(forwardIndex);</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; invertedIndex</b>
+&nbsp;                = (Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt;) map;
+&nbsp;
+<b class="fc">&nbsp;        Collection&lt;Map.Entry&lt;String, List&lt;String&gt;&gt;&gt; h = ib.buildHomePage(invertedIndex);</b>
+<b class="fc">&nbsp;        Map.Entry&lt;String, List&lt;String&gt;&gt; first = h.iterator().next();</b>
+&nbsp;
+&nbsp;        // Should be sorted by the term that has the most non-zero documents
+<b class="fc">&nbsp;        assertEquals(&quot;data&quot;, first.getKey(), &quot;The term &#39;data&#39; should have the most relevant articles of all terms&quot;);</b>
+<b class="fc">&nbsp;        assertEquals(3, first.getValue().size());</b>
+&nbsp;
+&nbsp;        // The documents should be sorted by TFIDF scores in descending order
+<b class="fc">&nbsp;        assertEquals(getUpennPageUrl(1), first.getValue().getFirst());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testSearchArticles() {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; forwardIndex = ib.buildIndex(docs);</b>
+<b class="fc">&nbsp;        Map&lt;?,?&gt; map = ib.buildInvertedIndex(forwardIndex);</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;String&gt; matches = ib.searchArticles(&quot;data&quot;, map);</b>
+<b class="fc">&nbsp;        assertEquals(3, matches.size(), &quot;There should be 3 articles with non-zero TFIDF scores&quot;);</b>
+&nbsp;
+&nbsp;        // Check they are in order from most relevant to least
+<b class="fc">&nbsp;        assertEquals(getUpennPageUrl(1), matches.get(0), &quot;Page 1 should be the most relevant to the term &#39;data&#39;&quot;);</b>
+<b class="fc">&nbsp;        assertEquals(getUpennPageUrl(2), matches.get(1));</b>
+<b class="fc">&nbsp;        assertEquals(getUpennPageUrl(3), matches.get(2));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Test
+&nbsp;    public void testCreateAutocompleteFile()
+&nbsp;    {
+<b class="fc">&nbsp;        List&lt;String&gt; feeds = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        feeds.add(UPENN_RSS_URL);</b>
+&nbsp;
+<b class="fc">&nbsp;        IndexBuilder ib = new IndexBuilder();</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;String&gt;&gt; docs = ib.parseFeed(feeds);</b>
+<b class="fc">&nbsp;        Map&lt;String, Map&lt;String, Double&gt;&gt; forwardIndex = ib.buildIndex(docs);</b>
+<b class="fc">&nbsp;        Map&lt;?,?&gt; map = ib.buildInvertedIndex(forwardIndex);</b>
+<b class="fc">&nbsp;        Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt; invertedIndex</b>
+&nbsp;                = (Map&lt;String, List&lt;AbstractMap.SimpleEntry&lt;String, Double&gt;&gt;&gt;) map;
+&nbsp;
+<b class="fc">&nbsp;        Collection&lt;Map.Entry&lt;String, List&lt;String&gt;&gt;&gt; h = ib.buildHomePage(invertedIndex);</b>
+&nbsp;
+<b class="fc">&nbsp;        ib.createAutocompleteFile(h);</b>
+<b class="fc">&nbsp;        assertTrue(Files.exists(Path.of(&quot;autocomplete.txt&quot;)));</b>
+&nbsp;
+&nbsp;        BufferedReader br;
+<b class="fc">&nbsp;        boolean isFirstLine = true;</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            br = new BufferedReader(new FileReader(&quot;autocomplete.txt&quot;));</b>
+&nbsp;            String line;
+<b class="fc">&nbsp;            while ((line = br.readLine()) != null) {</b>
+<b class="fc">&nbsp;                line = line.trim();</b>
+&nbsp;
+&nbsp;                // Check that the first line has the number of words
+<b class="fc">&nbsp;                if (isFirstLine) {</b>
+<b class="fc">&nbsp;                    isFirstLine = false;</b>
+<b class="fc">&nbsp;                    assertEquals(h.size(), Integer.parseInt(line));</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+&nbsp;                // All other lines should have the weight and word
+<b class="fc">&nbsp;                String[] parts = line.split(&quot;\\s+&quot;);</b>
+<b class="fc">&nbsp;                assertEquals(2, parts.length);</b>
+<b class="fc">&nbsp;                assertEquals(0, Integer.parseInt(parts[0]));</b>
+<b class="fc">&nbsp;                assertFalse(parts[1].isEmpty());</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-04-14 21:04</div>
+</div>
+</body>
+</html>

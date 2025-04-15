@@ -44,4 +44,8 @@ I've included a `jar` file for the Jsoup library, which is used to make network 
 
 ### Others
 
-All other files were written by me.
+All other files were written by me. 
+
+## Testing
+
+Test coverage report is available in `docs/html_test_coverage_report`.
