@@ -8,11 +8,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class IndexUtilsTest {
-
-    @Test
-    void getInverseDocumentFrequencies() {
-    }
-
     @Test
     void testGetUniqueWords() {
         Map<String, List<String>> docs = Map.ofEntries(

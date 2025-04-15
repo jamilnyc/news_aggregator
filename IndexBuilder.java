@@ -34,13 +34,14 @@ public class IndexBuilder implements IIndexBuilder {
                     System.out.println("Fetching HTML Document: " + htmlUrl);
                     htmlDoc = Jsoup.connect(htmlUrl).get();
                 } catch (IOException e) {
+                    // Skip articles that time out.
                     if (e instanceof java.net.SocketException
                     || e instanceof java.net.SocketTimeoutException) {
-                        // Skip articles that time out.
                         System.err.println("Skipping document due to a socket error");
                         continue;
                     }
 
+                    // Skip documents that are not found or not permitted
                     if (e instanceof HttpStatusException) {
                         List<Integer> skippableCodes = new ArrayList<>();
                         skippableCodes.add(403);
@@ -50,8 +51,8 @@ public class IndexBuilder implements IIndexBuilder {
                             System.err.println("Skipping document due HTTP status code: " + statusCode);
                             continue;
                         }
-
                     }
+
                     throw new RuntimeException(e);
                 }
 
@@ -97,6 +98,8 @@ public class IndexBuilder implements IIndexBuilder {
                     invertedIndex.put(word, new ArrayList<>());
                 }
 
+                // Only include documents that are actually relevant to the current term
+                // When a TFIDF score is 0, then it means the term does not appear in a particular document
                 if (tfidf > 0) {
                     invertedIndex.get(word).add(new AbstractMap.SimpleEntry<>(documentName, tfidf));
                 }
@@ -124,7 +127,7 @@ public class IndexBuilder implements IIndexBuilder {
 
     @Override
     public Collection<Map.Entry<String, List<String>>> buildHomePage(Map<?, ?> invertedIndex) {
-        System.out.println("Starting to build home page");
+        System.out.println("🏠 Starting to build home page");
         // Remove terms that are stop words
         Map<String, List<AbstractMap.SimpleEntry<String, Double>>> trueInvertedIndex = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) invertedIndex;
         Arrays.asList(STOPW).forEach(trueInvertedIndex.keySet()::remove);
@@ -200,15 +203,16 @@ public class IndexBuilder implements IIndexBuilder {
         Map<String, List<AbstractMap.SimpleEntry<String, Double>>> trueInvertedIndex = (Map<String, List<AbstractMap.SimpleEntry<String, Double>>>) invertedIndex;
         List<String> matchingArticles = new ArrayList<>();
         List<AbstractMap.SimpleEntry<String, Double>> termsToArticles = trueInvertedIndex.get(queryTerm);
+
+        // If there are no articles for a given term, then it is likely
+        // that the index was not built entirely.
         if (termsToArticles == null) {
             System.err.println("Term " + queryTerm + " not found. Did you build the whole index?");
             return matchingArticles;
         }
+
         for(AbstractMap.SimpleEntry<String, Double> entry : termsToArticles) {
-            // Only match articles that are actually relevant
-            if (entry.getValue() > 0) {
-                matchingArticles.add(entry.getKey());
-            }
+            matchingArticles.add(entry.getKey());
         }
 
         System.out.println("🔎 Search for '" + queryTerm + "': " + matchingArticles.size() + " results");

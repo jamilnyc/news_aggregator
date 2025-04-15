@@ -206,11 +206,15 @@ public class IndexBuilderTest {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
+
+                // Check that the first line has the number of words
                 if (isFirstLine) {
                     isFirstLine = false;
                     assertEquals(h.size(), Integer.parseInt(line));
                     continue;
                 }
+
+                // All other lines should have the weight and word
                 String[] parts = line.split("\\s+");
                 assertEquals(2, parts.length);
                 assertEquals(0, Integer.parseInt(parts[0]));

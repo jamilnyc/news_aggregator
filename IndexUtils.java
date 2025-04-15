@@ -2,6 +2,12 @@ import java.nio.DoubleBuffer;
 import java.util.*;
 
 public class IndexUtils {
+    /**
+     * Calculate the inverse document frequencies (IDF) of all words in the given map of documents.
+     *
+     * @param docs Map of document names to a list of the words in the document.
+     * @return Map of words to their IDF values.
+     */
     public static Map<String, Double> getInverseDocumentFrequencies(Map<String, List<String>> docs) {
         int totalNumberOfDocuments = docs.size();
 
@@ -33,6 +39,12 @@ public class IndexUtils {
     }
 
     // Returns Forward Index: map of document name to a map of terms -> TFIDF values in that document
+    /**
+     * Get a map of document names to a map of terms in that document and their colculated TFIDF values.
+     *
+     * @param docs Map of document names to a list of words in the document
+     * @return map of document names to a map of terms in the document to their TFIDF values
+     */
     public static Map<String, Map<String, Double>> calculateTFIDF(Map<String, List<String>> docs) {
         Map<String, Double> inverseDocumentFrequencies = getInverseDocumentFrequencies(docs);
         Map<String, Map<String, Double>> tfidf = new HashMap<>();
